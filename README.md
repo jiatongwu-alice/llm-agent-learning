@@ -1,31 +1,44 @@
-# Agent Job Market Analysis
-A lightweight job crawler and analysis pipeline for identifying AI Agent hiring trends in Germany.
+# LLM Agent Learning
 
+This repository documents my hands-on learning of **LLM-based AI Agents** through implementations, experiments, and notes.
+
+## Learning Resources
+
+Main references:
+
+* [Datawhale Hello-Agents](https://github.com/datawhalechina/hello-agents)
+* [Hugging Face Agents Course](https://huggingface.co/learn/agents-course)
+
+I reimplement key concepts for learning purposes and add my own notes, experiments, and modifications.
+
+## Topics
+
+* Agent fundamentals
+* Tool Calling
+* ReAct
+* Planning & Reflection
+* Memory
+* RAG
+* MCP
+* Agent Evaluation
+
+## Repository Structure
+
+```text
+llm-agent-learning/
+├── 01_agent_basics/
+├── 02_tool_calling/
+├── 03_react/
+├── 04_planning/
+├── 05_memory/
+├── 06_rag/
+├── 07_mcp/
+└── 08_evaluation/
+```
 
 ## Goal
-Collect and analyze AI Agent-related job postings in Germany to identify common use cases, required skills, and technology stacks.
 
-## Workflow
-Job sources
-→ Data collection
-→ Parsing
-→ Cleaning
-→ Classification
-→ Analysis
+The goal is to understand **how Agent systems work under the hood**, rather than only learning how to use existing frameworks.
 
-## Planned Fields
-- Job title
-- Company
-- Location
-- Job description
-- Required skills
-- Agent use case
-- Technology stack
-- Job type
-- Language requirements
+This repository is mainly for learning and experimentation. Complete end-to-end Agent projects will be maintained separately.
 
-## Status
-- [ ] Fetch first batch of jobs
-- [ ] Save structured data
-- [ ] Analyze recurring requirements
-- [ ] Use findings to guide Agent project proposal
