@@ -40,3 +40,33 @@ This prevents guessing field names or relying on one example response.
 
 Docs first, inspect second, code third.
 Understand the API schema → inspect the real response → write the parser.
+
+## 2026-08-27
+
+### Problem
+
+After adding `description`, each tool was no longer stored as a function directly.  
+Each tool `name` now points to a dictionary containing both `description` and `func`.
+
+### Why It Broke
+
+`getTool()` originally only retrieved the value under `name`.  
+After the structure changed, that value became the whole tool information dictionary instead of the function itself.
+
+### Better Approach
+
+The retrieval path now needs two steps:  
+tool `name` → tool information dictionary → `func`.
+
+### My Version vs Safer Version
+
+`self.tools.get(name).get("func")` works if `name` definitely exists.  
+If `name` does not exist, the first `.get(name)` returns `None`, so calling `.get("func")` on `None` causes an error.
+
+`self.tools.get(name, {}).get("func")` is safer.  
+If `name` does not exist, it returns an empty dictionary first, and the second `.get("func")` simply returns `None`.
+
+### Key Takeaway
+
+When data becomes nested, retrieval must follow the same nested structure.  
+For chained `.get()`, provide a safe default value when the next step still expects a dictionary.
