@@ -70,3 +70,41 @@ If `name` does not exist, it returns an empty dictionary first, and the second `
 
 When data becomes nested, retrieval must follow the same nested structure.  
 For chained `.get()`, provide a safe default value when the next step still expects a dictionary.
+
+## 2026-08-31
+
+### Problem
+
+I needed to parse the LLM's ReAct output into `Thought` and `Action`, and then further extract the action name and input.
+
+### My Version
+
+I first tested several real LLM responses and observed that the output format was relatively stable.
+
+Based on that actual structure, I wrote a simpler parser that relies on the final non-empty `Thought` and `Action` lines, with lightweight regex/string operations for extraction.
+
+This version is easier for me to understand, debug, and modify.
+
+### Tutorial Version
+
+The tutorial uses a more general regex-based parser.
+
+Instead of relying on fixed line positions, it matches the `Thought:` and `Action:` patterns directly and can better handle cases such as multi-line content or slightly less stable formatting.
+
+It also includes safer fallback behavior when the expected format is not matched.
+
+### My Version vs Tutorial Version
+
+My version is more targeted to the response format I actually observed during testing.
+
+The tutorial version is more robust and general, but also more complex because it relies more heavily on regular expressions.
+
+For the current stage, I prefer to keep my simpler version because it already works with the tested responses and makes the parsing logic easier to understand.
+
+If later tests reveal format changes, multi-line parsing issues, or parsing errors, I can then upgrade the relevant parts toward the more general regex version.
+
+### Key Takeaway
+
+A parser does not need to be maximally general from the beginning.
+
+It is reasonable to start with a simple implementation based on observed output patterns, verify it with multiple real responses, and only add more robust regex handling when an actual failure case appears.
