@@ -487,3 +487,149 @@ Keeping these responsibilities separate avoids processing the same data twice.
 **When a function's responsibility changes, its tests must change with it.**
 
 Test internal parsers separately and test `run()` as the complete Agent workflow.
+
+##  2026-09-04
+
+## 1. Converting the Plan from `str` to `list`
+
+### Problem
+
+The Planner successfully generated a structured plan, but the LLM response was still returned as a string.
+
+For example:
+
+````text
+```python
+["step 1", "step 2", "step 3"]
+````
+
+````
+
+Although the content looks like a Python list, its actual type is still:
+
+```python
+str
+````
+
+This creates a problem for the Executor because it needs to process each plan step separately.
+
+If the plan remains a string, iterating over it would process individual characters instead of complete steps.
+
+### Better Approach
+
+First extract the list content from the Markdown code block:
+
+````python
+plan_str = response.split("```python")[1].split("```")[0].strip()
+````
+
+Then convert the list-like string into a real Python list:
+
+```python
+plan = ast.literal_eval(plan_str)
+```
+
+The result becomes:
+
+```python
+["step 1", "step 2", "step 3"]
+```
+
+with type:
+
+```python
+list
+```
+
+### Why It Helps
+
+The Executor can now iterate through the plan step by step:
+
+```python
+for step in plan:
+```
+
+Each `step` represents one complete task instead of one character from the original string.
+
+This also makes the Planner output easier to use as structured data in later Agent components.
+
+### Key Takeaway
+
+**LLM output may look structured without actually being structured data.**
+
+Convert the model output into the correct Python data type before passing it to later components.
+
+---
+
+## 2. Plan-and-Solve Cannot Perform Real Search Without Tools
+
+### Problem
+
+The first Plan-and-Solve test asked the Agent to research the latest developments in AI agents.
+
+The Planner successfully generated steps such as:
+
+```text
+Collect recent publications
+Analyze recent developments
+Summarize the main trends
+```
+
+The Executor also completed each step without errors.
+
+However, the Executor currently only executes:
+
+```python
+self.llm.think(...)
+```
+
+It has no search tool or external retrieval capability.
+
+As a result, when the plan asks the Executor to "search" or "collect recent information", the LLM only generates an answer from its existing knowledge instead of actually searching external sources.
+
+### Better Approach
+
+Do not treat this as a failure of the Plan-and-Solve loop itself.
+
+First test the baseline with a task that does not require external tools.
+
+For example, an arithmetic reasoning problem was used instead:
+
+```text
+Monday: 15 apples
+Tuesday: twice Monday
+Wednesday: 5 fewer than Tuesday
+```
+
+The Planner generated the steps correctly, the Executor processed them sequentially, and the final answer was:
+
+```text
+70
+```
+
+This confirmed that the core Plan-and-Solve workflow was working correctly.
+
+Real search capability can be added later by integrating tools into the Executor.
+
+### Why It Helps
+
+Separating the Agent workflow from tool capability makes debugging easier.
+
+It helps distinguish between:
+
+* Planner errors
+
+* Executor loop errors
+
+* History propagation errors
+
+* Missing external tools
+
+A task may require search, but that does not mean the planning or execution framework itself is broken.
+
+### Key Takeaway
+
+**A step that says "search" does not mean the Agent actually searched.**
+
+Without a real search tool, the Executor only asks the LLM to generate an answer based on its existing knowledge.
+
